@@ -38,46 +38,52 @@ public class MainActivity extends BaseActivity {
     }
 
     private void callApiThreadPool(){
-        showProgress("Loading");
-        String URL_LOGIN = Contants.URL + "driver/login";
-        HashMap<String,String> hsPass = new HashMap<>();
-        hsPass.put("password", "123456");
+        if (!isConnected()){
+            tvKQ.setText("Please check your connection!");
 
-        HashMap<String,String> hsEmail = new HashMap<>();
-        hsEmail.put("email", "vinh270795@gmail.com");
+        }else {
+            showProgress("Loading");
+            String URL_LOGIN = Contants.URL + "driver/login";
+            HashMap<String,String> hsPass = new HashMap<>();
+            hsPass.put("password", "123456");
 
-        attrs.add(hsPass);
-        attrs.add(hsEmail);
-        TaskRunnable taskRunnable = new TaskRunnable(URL_LOGIN, attrs, new UserCallBack() {
-            @Override
-            public void OnComplete(final String data) {
-                UIThreadExecutor.getInstance().runOnUIThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            JSONObject jsonObject = new JSONObject(data);
-                            String status = jsonObject.getString("status");
-                            if (status.equals("success")){
-                                dismissProgress();
-                                tvKQ.setText("Cập nhật UI pải nằm ở MainThread");
+            HashMap<String,String> hsEmail = new HashMap<>();
+            hsEmail.put("email", "vinh270795@gmail.com");
 
-                            }else {
-                                dismissProgress();
-                                tvKQ.setText(status);
+            attrs.add(hsPass);
+            attrs.add(hsEmail);
+
+            TaskRunnable taskRunnable = new TaskRunnable(URL_LOGIN, attrs, new UserCallBack() {
+                @Override
+                public void OnComplete(final String data) {
+                    UIThreadExecutor.getInstance().runOnUIThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                JSONObject jsonObject = new JSONObject(data);
+                                String status = jsonObject.getString("status");
+                                if (status.equals("success")){
+                                    dismissProgress();
+                                    tvKQ.setText("Cập nhật UI pải nằm ở MainThread");
+
+                                }else {
+                                    dismissProgress();
+                                    tvKQ.setText(status);
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
                             }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
                         }
-                    }
-                });
-            }
+                    });
+                }
 
-            @Override
-            public void OnError(Exception ex) {
-                Log.d("OnError","callApiThreadPool: "+ ex.toString());
-            }
-        });
-        BackgroundThreadExecutor.getInstance().runOnBackground(taskRunnable);
+                @Override
+                public void OnError(Exception ex) {
+                    Log.d("OnError","callApiThreadPool: "+ ex.toString());
+                }
+            });
+            BackgroundThreadExecutor.getInstance().runOnBackground(taskRunnable);
+        }
     }
 
     private void callApiRunnable(){

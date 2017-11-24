@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.v7.app.AppCompatActivity;
@@ -75,5 +76,29 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
         return false;
     }
+    public void checkConnectedDialogShow(){
+        checkConnectedDialog().show();
+    }
 
+    private AlertDialog.Builder checkConnectedDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(false);
+        builder.setTitle("No Internet Connection!");
+        builder.setMessage("You need to have Mobile Data or Wifi to access this.");
+        builder.setNegativeButton("Exit", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                finish();
+            }
+        });
+        builder.setPositiveButton("Settings", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                Intent intent = new Intent(Intent.ACTION_MAIN);
+                intent.setClassName("com.android.settings", "com.android.settings.wifi.WifiSettings");
+                startActivity(intent);
+            }
+        });
+        return builder;
+    }
 }
