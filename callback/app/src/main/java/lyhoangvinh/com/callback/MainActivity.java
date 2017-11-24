@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import lyhoangvinh.com.callback.thread.BackgroundThreadExecutor;
+import lyhoangvinh.com.callback.thread.UIThreadExecutor;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -49,24 +50,21 @@ public class MainActivity extends AppCompatActivity {
         attrs.add(hsEmail);
         TaskRunnable taskRunnable = new TaskRunnable(URL_LOGIN, attrs, new UserCallBack() {
             @Override
-            public void OnComplete(String data) {
-                Log.d("OnComplete", data);
-                try {
-                    JSONObject jsonObject = new JSONObject(data);
-                    Log.d("OnComplete", "jsonObject: " + jsonObject);
-                    final String status = jsonObject.getString("status");
-                    Log.d("OnComplete", "status: " + status);
-                    if (status.equals("success")){
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
+            public void OnComplete(final String data) {
+                UIThreadExecutor.getInstance().runOnUIThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            JSONObject jsonObject = new JSONObject(data);
+                            String status = jsonObject.getString("status");
+                            if (status.equals("success")){
                                 tvKQ.setText(status);
                             }
-                        });
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                });
             }
 
             @Override
