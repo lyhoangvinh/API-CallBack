@@ -6,5 +6,5 @@ package lyhoangvinh.com.callback;
 
 public interface UserCallBack {
     void OnComplete(String data);
-    void OnError();
+    void OnError(Exception ex);
 }

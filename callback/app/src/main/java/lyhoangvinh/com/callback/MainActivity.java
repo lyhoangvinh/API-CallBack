@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import lyhoangvinh.com.callback.thread.BackgroundThreadExecutor;
+
 public class MainActivity extends AppCompatActivity {
 
     private TextView tvKQ;
@@ -30,9 +32,49 @@ public class MainActivity extends AppCompatActivity {
         btnStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                callApiRunnable();
+                callApiThreadPool();
             }
         });
+    }
+
+    private void callApiThreadPool(){
+        String URL_LOGIN = Contants.URL + "driver/login";
+        HashMap<String,String> hsPass = new HashMap<>();
+        hsPass.put("password", "123456");
+
+        HashMap<String,String> hsEmail = new HashMap<>();
+        hsEmail.put("email", "vinh270795@gmail.com");
+
+        attrs.add(hsPass);
+        attrs.add(hsEmail);
+        TaskRunnable taskRunnable = new TaskRunnable(URL_LOGIN, attrs, new UserCallBack() {
+            @Override
+            public void OnComplete(String data) {
+                Log.d("OnComplete", data);
+                try {
+                    JSONObject jsonObject = new JSONObject(data);
+                    Log.d("OnComplete", "jsonObject: " + jsonObject);
+                    final String status = jsonObject.getString("status");
+                    Log.d("OnComplete", "status: " + status);
+                    if (status.equals("success")){
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                tvKQ.setText(status);
+                            }
+                        });
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void OnError(Exception ex) {
+                Log.d("OnError","callApiThreadPool: "+ ex.toString());
+            }
+        });
+        BackgroundThreadExecutor.getInstance().runOnBackground(taskRunnable);
     }
 
     private void callApiRunnable(){
@@ -45,25 +87,20 @@ public class MainActivity extends AppCompatActivity {
 
         attrs.add(hsPass);
         attrs.add(hsEmail);
-        new Thread(new TaskRunnable(URL_LOGIN, attrs, new UserCallBack() {
+
+        TaskRunnable taskRunnable = new TaskRunnable(URL_LOGIN, attrs, new UserCallBack() {
             @Override
             public void OnComplete(String data) {
-                if (data!=null){
-                    try {
-                        JSONObject jsonObject = new JSONObject(data);
-                        String status = jsonObject.getString("status");
-                        Log.d("status", status);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
+
             }
 
             @Override
-            public void OnError() {
-                Toast.makeText(MainActivity.this, "error", Toast.LENGTH_SHORT).show();
+            public void OnError(Exception ex) {
+
             }
-        })).start();
+        });
+        Thread thread = new Thread(taskRunnable);
+        thread.start();
     }
 
     private void CallApiThred(){
@@ -92,8 +129,8 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void OnError() {
-                Toast.makeText(MainActivity.this, "error", Toast.LENGTH_SHORT).show();
+            public void OnError(Exception ex) {
+                Toast.makeText(MainActivity.this, ex.toString(), Toast.LENGTH_SHORT).show();
             }
         });
         taskThred.start();

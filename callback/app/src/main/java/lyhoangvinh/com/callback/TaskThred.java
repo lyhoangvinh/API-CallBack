@@ -51,14 +51,14 @@ public class TaskThred extends Thread {
             }
 
         } catch (MalformedURLException e) {
+            callBack.OnError(e);
             e.printStackTrace();
         } catch (IOException e) {
+            callBack.OnError(e);
             e.printStackTrace();
         }
         if (callBack!=null){
             callBack.OnComplete(data);
-        }else {
-            callBack.OnError();
         }
         Log.d("dulieu",data);
     }
