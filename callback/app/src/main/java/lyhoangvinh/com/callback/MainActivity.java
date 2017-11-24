@@ -1,7 +1,6 @@
 package lyhoangvinh.com.callback;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -18,7 +17,7 @@ import java.util.List;
 import lyhoangvinh.com.callback.thread.BackgroundThreadExecutor;
 import lyhoangvinh.com.callback.thread.UIThreadExecutor;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
 
     private TextView tvKQ;
     private Button btnStart;
@@ -39,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void callApiThreadPool(){
+        showProgress("Loading");
         String URL_LOGIN = Contants.URL + "driver/login";
         HashMap<String,String> hsPass = new HashMap<>();
         hsPass.put("password", "123456");
@@ -58,8 +58,11 @@ public class MainActivity extends AppCompatActivity {
                             JSONObject jsonObject = new JSONObject(data);
                             String status = jsonObject.getString("status");
                             if (status.equals("success")){
+                                dismissProgress();
                                 tvKQ.setText("Cập nhật UI pải nằm ở MainThread");
+
                             }else {
+                                dismissProgress();
                                 tvKQ.setText(status);
                             }
                         } catch (JSONException e) {
