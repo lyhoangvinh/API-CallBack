@@ -58,6 +58,8 @@ public class MainActivity extends AppCompatActivity {
                             JSONObject jsonObject = new JSONObject(data);
                             String status = jsonObject.getString("status");
                             if (status.equals("success")){
+                                tvKQ.setText("Cập nhật UI pải nằm ở MainThread");
+                            }else {
                                 tvKQ.setText(status);
                             }
                         } catch (JSONException e) {
