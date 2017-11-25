@@ -65,6 +65,9 @@ public class MainActivity extends BaseActivity {
                                 if (status.equals("success")){
                                     dismissProgress();
                                     tvKQ.setText("Cập nhật UI pải nằm ở MainThread");
+                                    JSONObject objectData = jsonObject.getJSONObject("data");
+                                    String lastname = objectData.getString("lastname");
+                                    Toast.makeText(MainActivity.this, lastname, Toast.LENGTH_SHORT).show();
 
                                 }else {
                                     dismissProgress();
